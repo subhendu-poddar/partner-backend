@@ -304,7 +304,7 @@ exports.toggleAcceptOrder = async(req, res) => {
             }
         });
 
-        if (!before.dataValues) {
+        if (!before) {
             res.status(400).send({
                 success: false,
                 message:
@@ -353,6 +353,21 @@ exports.toggleAcceptOrder = async(req, res) => {
 exports.retrieveOrders = async (req, res) => {
     const restaurantId = req.params.id; // getting restaurant Id
     const currentStatus = req.params.status; // pending orders or completed orders
+
+    const isRestaurant = await Restaurant.findOne({
+        where: {
+            id: restaurantId
+        }
+    });
+
+    if (!isRestaurant) {
+        res.status(400).send({
+            success: false,
+            message:
+                "Restaurant doesn't exists!! "
+        })
+
+    }
 
     if (currentStatus !== "received" && currentStatus !== "preparing" && currentStatus !== "packing" && currentStatus !== "out_for_delivery" && currentStatus !== "completed" && currentStatus!== "all") {     // null status means all the orders
                                                                                         // irrespective of category
@@ -421,17 +436,46 @@ exports.retrieveOrders = async (req, res) => {
 exports.pastOrders = async(req, res) => {
 
     const restaurantId = req.params.id;
-
+    
     try {
+        const isRestaurant = await Restaurant.findOne({
+            where: {
+                id: restaurantId
+            }
+        });
+
+        if (!isRestaurant) {
+            res.status(400).send({
+                success: false,
+                message:
+                    "Restaurant doesn't exists!! "
+            })
+
+        }
+
+        if(!req.body.startDate || !req.body.endDate){
+            return res.status(400).send({
+                message:
+                    `Give Proper Date Interval (startDate and endDate).`
+            })
+        }
+
+        if(req.body.endDate < req.body.startDate) {
+            return res.status(400).send({
+                message:
+                    `startDate should be less than or equal endDate.`
+            })
+        }
+
         const data = await Order.findAll({
             where: {
                 restaurant_id: restaurantId,
-                created_at: {
-                    $gte: req.body.startDate,
-                    $lt: req.body.endDate
+                createdAt: {
+                    [Op.between]: [req.body.startDate, req.body.endDate]
                 }
             }
         })
+
         if(data.length === 0){
             res.send({
                 message:

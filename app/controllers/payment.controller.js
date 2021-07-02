@@ -1,25 +1,39 @@
 const db = require("../models");
 
-const Dish = db.dish;
+const Payment = db.payment;
 const Order = db.order;
-const Address = db.address;
-const Restaurant = db.restaurant;
 
 // Create and Save a new Order
 exports.create = async (req, res) => {
     // Validate request
     if (!req.body.orderId || !req.body.gatewayId || !req.body.gateway) {
         return res.status(400).send({
-            message: "OrderId or GatewayId can not be empty!"
+            message: "OrderId or Gateway can not be empty!"
         });
     }
 
     try {
-        const found = await Payment.findOne({
+        var order = await Order.findOne({
+            where: {
+                id: req.body.orderId
+            }
+        })
+
+        if(!order){
+            return res.status(400).send({
+                message:
+                    `Order doesn't exist.`
+            })
+        }
+
+        console.log(order.dataValues.total_price);
+
+        var found = await Payment.findOne({
             where: {
                 orderId: req.body.orderId
             }
         })
+        console.log(found);
 
         if(found){
             return res.status(400).send({
@@ -30,7 +44,7 @@ exports.create = async (req, res) => {
         } else {
 
             const payment = {
-                amount: req.body.amount,
+                amount: order.dataValues.total_price,
                 orderId: req.body.orderId,
                 gatewayId: req.body.gatewayId,
                 gateway: req.body.gateway
@@ -131,7 +145,7 @@ exports.update = (req, res) => {
 };
 
 // Delete a Order with the specified id in the request
-exports.delete = async (req, res) => {
+exports.deleteOne = async (req, res) => {
     const id = req.params.id;
 
     try {

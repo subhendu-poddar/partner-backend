@@ -179,48 +179,6 @@ exports.deleteAll = async (req, res) => {
     }
 };
 
-// process an order of a restaurant * order status and restaurant_id is given
-// exports.processOrder = async (req, res) => {
-//     const restaurantId = req.params.id; // getting restaurant Id
-//     const status = req.params.status; // pending orders or completed orders
-
-//     if (status !== "received" && status !== "preparing" && status !== "packing" && status !== "out_for_delivery" && status !== "completed") {
-//         return res.status(400).send({
-//             message:
-//                 "Invalid status"
-//         });
-//     }
-
-//     try {
-//         const data = await Order.update(req.body.status, {
-//             where: {
-//                 status: status,
-//                 restaurant_id: restaurantId
-//             }
-//         })
-
-//         if (data[0] === 1) {
-//             console.log(data);
-//             return res.status(200).send({
-//                 message:
-//                     "Order status changed successfully."
-//             })
-//         } else {
-//             return res.status(400).send({
-//                 message:
-//                     "No orders are available right now. Wait for the next Order."
-//             });
-//         }
-
-//     } catch (err) {
-//         return res.status(500).send({
-//             message: `Some error occurred in retrieving ${status} orders.`,
-//             description: err
-//         });
-//     }
-
-// }
-
 // Update a Order by the id in the request | This also includes processing order
 exports.update = (req, res) => {
     const id = req.params.id;
@@ -245,3 +203,4 @@ exports.update = (req, res) => {
             });
         });
 };
+

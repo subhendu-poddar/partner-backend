@@ -5,16 +5,16 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         orderId: {
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER,
             allowNull: false
         },
         status: {
             type: DataTypes.STRING,
-            allowNull: false
+            defaultValue: "initiated"
         },
         isRefunded: {
             type: DataTypes.BOOLEAN,
-            allowNull: false
+            defaultValue: false
         },
         refundId: {
             type: DataTypes.INTEGER,
