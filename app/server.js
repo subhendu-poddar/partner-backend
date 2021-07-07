@@ -34,6 +34,7 @@ require("./routes/restaurant.routes")(app);
 require("./routes/dish.routes")(app);
 require("./routes/user.routes")(app);
 require("./routes/payment.routes")(app);
+require("./routes/refund.routes")(app);
 require("./routes/partner.routes")(app);
 require("./routes/category.routes")(app);
 require("./routes/order.routes")(app);

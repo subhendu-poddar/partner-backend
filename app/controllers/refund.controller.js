@@ -2,13 +2,14 @@ const db = require("../models");
 
 const Payment = db.payment;
 const Order = db.order;
+const Refund = db.refund;
 
 // Create and Save a new Order
 exports.create = async (req, res) => {
     // Validate request
-    if (!req.body.orderId || !req.body.gatewayId || !req.body.gateway) {
+    if (!req.body.orderId || !req.body.paymentId) {
         return res.status(400).send({
-            message: "OrderId or Gateway can not be empty!"
+            message: "orderId or PaymentId can not be empty!"
         });
     }
 
@@ -19,49 +20,44 @@ exports.create = async (req, res) => {
             }
         })
 
-        if(!order){
+        if (!order) {
             return res.status(400).send({
                 message:
-                    `Order doesn't exist.`
+                    `Order with order Id = ${req.body.orderId} doesn't exist.`
             })
         }
 
-        console.log(order.dataValues.total_price);
-
-        var found = await Payment.findOne({
+        var payment = await Payment.findOne({
             where: {
-                orderId: req.body.orderId
+                paymentId : req.body.paymentId
             }
         })
-        console.log(found);
 
-        if(found){
+        if (!payment) {
             return res.status(400).send({
                 message:
-                    `Payment for the orderId ${req.body.orderId} already exists.`
+                    `Payment with payment Id = ${req.body.paymentId} doesn't exists.`
             })
 
         } else {
 
-            const payment = {
-                amount: order.dataValues.total_price,
+            const refund = {
                 orderId: req.body.orderId,
-                gatewayId: req.body.gatewayId,
-                gateway: req.body.gateway
+                paymentId: req.body.paymentId
             }
 
-            const data = await Payment.create(payment);
+            const data = await Refund.create(refund);
 
-            if(data) {
+            if (data) {
                 return res.status(200).send({
                     message:
-                        `Payment with the orderId ${req.body.orderId} created successfully.`
+                        `Refund for the orderId = ${req.body.orderId} and payment Id = ${req.body.paymentId} created successfully.`
                 })
             }
-            else{
+            else {
                 return res.status(400).send({
                     message:
-                        `Error while creating the payment with order id ${req.body.orderId}.`
+                        `Error while creating refund with orderId = ${req.body.orderId} and payment Id = ${req.body.paymentId}.`
                 })
             }
 
@@ -72,39 +68,48 @@ exports.create = async (req, res) => {
             description: err
         });
     }
-    
+
 };
 
-// Fetch all Payments from the database.
+// Fetch all Refund from the database.
 exports.getAll = async (req, res) => {
 
     try {
-        const data = await Payment.findAll({
+        const data = await Refund.findAll({
             where: {}
         });
 
-        return res.send(data);
+        if(data.length > 0){
+
+            return res.status(200).send(data);
+        } else {
+
+            return res.status(400).send({
+                message: `No Refunds data are there.`
+            })
+        }
+
     }
     catch (err) {
         return res.status(500).send({
-            message: "Some error occurred while fetching Payments.",
+            message: "Some error occurred while fetching Refunds.",
             description: err
         });
     }
 };
 
-// Find a single Payment with an id
+// Find a single Refund with an id
 exports.getOne = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const data = await Payment.findOne({
+        const data = await Refund.findOne({
             where: { id: id }
         });
 
         if (!data) {
             return res.status(404).send({
-                message: `Payment with id=${id} was not found`
+                message: `Refund with id=${id} doesn't exist.`
             });
         }
         else {
@@ -123,49 +128,49 @@ exports.getOne = async (req, res) => {
 exports.update = (req, res) => {
     const id = req.params.id;
 
-    Payment.update(req.body, {
+    Refund.update(req.body, {
         where: { id: id }
     })
         .then(num => {
             if (num[0] === 1) {
                 res.send({
-                    message: "Payment was updated successfully."
+                    message: "Refund was updated successfully."
                 });
             } else {
                 res.send({
-                    message: `Cannot update Payment with id=${id}. Maybe Payment was not found or req.body is empty!`
+                    message: `Cannot update Refund with id=${id}. Maybe Refund was not found or req.body is empty!`
                 });
             }
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error updating Payment with id=" + id
+                message: "Error updating Refund with id=" + id
             });
         });
 };
 
-// Delete a Payment with the specified id in the request
+// Delete a Refund with the specified id in the request
 exports.deleteOne = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const data = await Payment.destroy({
+        const data = await Refund.destroy({
             where: { id: id }
         });
 
         if (data === 1) {
             return res.send({
-                message: "Payment was deleted successfully!"
+                message: "Refund was deleted successfully!"
             });
         } else {
             return res.send({
-                message: `Cannot delete Payment with id=${id}. Maybe Payment was not found!`
+                message: `Cannot delete Refund with id=${id}. Maybe Refund was not found!`
             });
         }
     }
     catch (err) {
         return res.status(500).send({
-            message: `Could not delete Payment with id= + ${id}`,
+            message: `Could not delete Refund with id= + ${id}`,
             description: err
         });
     }
@@ -175,16 +180,16 @@ exports.deleteOne = async (req, res) => {
 exports.deleteAll = async (req, res) => {
 
     try {
-        const payment = await Payment.destroy({
+        const refund = await Refund.destroy({
             where: {},
             truncate: false
         });
 
-        return res.send({ message: `${payment} Payment were deleted successfully!` });
+        return res.send({ message: `${refund} Refund were deleted successfully!` });
     }
     catch (err) {
         return res.status(500).send({
-            message: "Some error occurred while removing all Payments.",
+            message: "Some error occurred while removing all Refunds.",
             description: err
         });
     }
