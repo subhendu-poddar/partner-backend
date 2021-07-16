@@ -8,7 +8,7 @@ const Restaurant = db.restaurant;
 // Create and Save a new Order
 exports.create = async (req, res) => {
     // Validate request
-    if (!req.body.dishes || !req.body.order_price || !req.body.delivery_price || !req.body.tax_price || !req.body.total_price /* || !req.body.address_id */ ||  !req.body.restaurant_id) {
+    if (!req.body.dishes || !req.body.order_price || !req.body.delivery_price || !req.body.tax_price || !req.body.total_price || !req.body.address_id ||  !req.body.restaurant_id) {
         
         res.status(400).send({
             message: "Content can not be empty!"
@@ -23,7 +23,7 @@ exports.create = async (req, res) => {
         }
     });
 
-    if (!address) {
+    if (address) {
         // Create a Order
         const order = {
             order_price: req.body.order_price,
