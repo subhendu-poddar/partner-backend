@@ -8,19 +8,19 @@ module.exports = app => {
     const router = require("express").Router();
 
     // Create a new Order
-    router.post("/",/* [authJwt.verifyJwtToken, permit(ROLES.DEFAULT)], */ order.create);
+    router.post("/",[authJwt.verifyJwtToken, permit(ROLES.DEFAULT)], order.create);
 
     // Retrieve all Orders
-    router.get("/", /* [authJwt.verifyJwtToken, permit(ROLES.PARTNER, ROLES.DEFAULT)], */ order.findAll);
+    router.get("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER, ROLES.DEFAULT)], order.findAll);
 
     // Retrieve a single Order with id
-    router.get("/:id", /* [authJwt.verifyJwtToken, permit(ROLES.PARTNER, ROLES.DEFAULT)], */ order.findOne);
+    router.get("/:id", [authJwt.verifyJwtToken, permit(ROLES.PARTNER, ROLES.DEFAULT)], order.findOne);
 
     // Delete a Order with id
-    router.delete("/:id", /* [authJwt.verifyJwtToken, permit(ROLES.PARTNER, ROLES.DEFAULT)], */ order.delete);
+    router.delete("/:id", [authJwt.verifyJwtToken, permit(ROLES.PARTNER, ROLES.DEFAULT)], order.delete);
 
     // Delete all Orders
-    router.delete("/", /* [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], */ order.deleteAll);
+    router.delete("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], order.deleteAll);
 
     // update an order (this) includes process also
     router.put("/:id", order.update);
